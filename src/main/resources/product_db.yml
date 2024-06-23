@@ -8,3 +8,4 @@ services:
       - POSTGRES_DB=product_db_java
     ports:
       - "5432:5432"
+#sudo docker compose -f product_db.yml -p product_db_java up --build

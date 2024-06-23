@@ -1,18 +1,15 @@
 package com.kingict.kingictintership2024java.controller;
 
 import com.kingict.kingictintership2024java.dto.ApiResponse;
-import com.kingict.kingictintership2024java.dto.ProductDto;
-import com.kingict.kingictintership2024java.service.IExternalApiService;
 import com.kingict.kingictintership2024java.service.IProductService;
 import com.kingict.kingictintership2024java.service.implementations.DummyJsonService;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/dummy-json")
@@ -20,6 +17,7 @@ public class DummyJsonController {
     
     private final DummyJsonService externalApiService;
     private final IProductService productService;
+    private final Logger logger = LogManager.getLogger(DummyJsonController.class);
 
     public DummyJsonController(DummyJsonService externalApiService, IProductService productService) {
         this.externalApiService = externalApiService;
@@ -38,6 +36,7 @@ public class DummyJsonController {
                     "All products retrieved!",
                     "Products from Dummy Json API have been retrieved successfully"));
         } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
             return ResponseEntity
                     .internalServerError()
                     .body(new ApiResponse<>(false,

@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Repository
 public interface IProductRepository extends JpaRepository<Product, UUID> {
-    @Query("SELECT x FROM Product x WHERE x.title = :title")
+    @Query("SELECT x FROM Product x WHERE LOWER(x.title) LIKE %:title%")
     List<Product> findAllProductsByTitle(@Param("title") String title);
     
     @Query("SELECT x FROM Product x WHERE x.category = :category AND x.price <= :price")

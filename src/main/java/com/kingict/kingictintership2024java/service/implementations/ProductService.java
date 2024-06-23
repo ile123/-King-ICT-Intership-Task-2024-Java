@@ -9,6 +9,10 @@ import com.kingict.kingictintership2024java.model.Product;
 import com.kingict.kingictintership2024java.repository.IProductRepository;
 import com.kingict.kingictintership2024java.service.IProductService;
 import jakarta.transaction.Transactional;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,6 +28,7 @@ public class ProductService implements IProductService {
     
     private final IProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final Logger logger = LogManager.getLogger(ProductService.class);
 
     public ProductService(IProductRepository productRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
@@ -31,6 +36,7 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Cacheable(value = "products")
     public ApiResponse<List<ProductDto>> getAllProducts() {
         var products = productRepository.findAll();
         var productDtos = products
@@ -41,8 +47,9 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Cacheable(value = "productsByName", key = "#title")
     public ApiResponse<List<ProductDto>> getAllProductsByName(String title) {
-        var products = productRepository.findAllProductsByTitle(title);
+        var products = productRepository.findAllProductsByTitle(title.toLowerCase());
         var productDtos = products
                 .stream()
                 .map(productMapper::toProductDto)
@@ -51,16 +58,18 @@ public class ProductService implements IProductService {
     }
 
     @Override
+    @Cacheable(value = "productsByCategoryAndPrice", key = "#category + '_' + #category + '_' + #price")
     public ApiResponse<List<ProductDto>> getAllProductsByCategoryAndPrice(String category, float price) {
         var products = productRepository.findAllProductsByCategoryAndPrice(category, price);
         var productDtos = products
                 .stream()
                 .map(productMapper::toProductDto)
                 .toList();
-        return new ApiResponse<>(false, "All products by category and price retrieved", productDtos);
+        return new ApiResponse<>(true, "All products by category and price retrieved", productDtos);
     }
 
     @Override
+    @Cacheable(value = "productsById", key = "#id")
     public ApiResponse<ProductDto> getProductById(UUID id) {
         try {
             var product = productRepository
@@ -68,6 +77,7 @@ public class ProductService implements IProductService {
                     .orElseThrow(() -> new Exception("ERROR: Product with given id not found -> "));
             return new ApiResponse<>(true, "Product with given id found", productMapper.toProductDto(product));
         } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
             return new ApiResponse<>(false, e.getMessage(), new ProductDto(UUID.randomUUID(), "", 0.0f, "", "", "", new ArrayList<>()));
         }
     }
@@ -75,6 +85,7 @@ public class ProductService implements IProductService {
     @Override
     public void saveProduct(AddProductDto addProductDto) {
         if(productRepository.doesProductWithSkuExist(addProductDto.sku()).isPresent()) return;
+        if(!validateProduct(addProductDto)) return;
         var product = Product
                 .builder()
                 .title(addProductDto.title())
@@ -105,12 +116,12 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public boolean validateProduct(Product product) {
-        if(product.getTitle().isBlank() || product.getTitle().isEmpty()) return false;
-        if(product.getDescription().isBlank() || product.getDescription().isEmpty() || product.getDescription().length() > 100) return false;
-        if(product.getCategory().isBlank() || product.getCategory().isEmpty()) return false;
-        if(product.getSku().isBlank() || product.getSku().isEmpty()) return false;
-        if(product.getImages().isEmpty()) return false;
+    public boolean validateProduct(AddProductDto product) {
+        if(product.title().isBlank() || product.title().isEmpty()) return false;
+        if(product.description().isBlank() || product.description().isEmpty() || product.description().length() > 100) return false;
+        if(product.category().isBlank() || product.category().isEmpty()) return false;
+        if(product.sku().isBlank() || product.sku().isEmpty()) return false;
+        if(product.images().isEmpty()) return false;
         return true;
     }
 }

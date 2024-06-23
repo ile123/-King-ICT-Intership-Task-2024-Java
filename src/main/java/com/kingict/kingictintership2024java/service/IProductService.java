@@ -15,5 +15,5 @@ public interface IProductService {
     ApiResponse<List<ProductDto>> getAllProductsByCategoryAndPrice(String category, float price);
     ApiResponse<ProductDto> getProductById(UUID id);
     void saveProduct(AddProductDto addProductDto);
-    boolean validateProduct(Product product);
+    boolean validateProduct(AddProductDto product);
 }

@@ -3,6 +3,11 @@ package com.kingict.kingictintership2024java.controller;
 import com.kingict.kingictintership2024java.dto.ApiResponse;
 import com.kingict.kingictintership2024java.dto.ProductDto;
 import com.kingict.kingictintership2024java.service.IProductService;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +20,7 @@ import java.util.UUID;
 public class ProductController {
     
     private final IProductService productService;
+    private final Logger logger = LogManager.getLogger(ProductController.class);
 
     public ProductController(IProductService productService) {
         this.productService = productService;
@@ -26,6 +32,7 @@ public class ProductController {
             var allProducts = productService.getAllProducts();
             return ResponseEntity.ok(allProducts);
         } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
             return ResponseEntity
                     .internalServerError()
                     .body(new ApiResponse<>(false, e.getMessage(), new ArrayList<>()));
@@ -39,6 +46,7 @@ public class ProductController {
             var allProducts = productService.getAllProductsByName(name);
             return ResponseEntity.ok(allProducts);
         } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
             return ResponseEntity
                     .internalServerError()
                     .body(new ApiResponse<>(false, e.getMessage(), new ArrayList<>()));
@@ -53,6 +61,7 @@ public class ProductController {
             var allProducts = productService.getAllProductsByCategoryAndPrice(category, price);
             return ResponseEntity.ok(allProducts);
         } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
             return ResponseEntity
                     .internalServerError()
                     .body(new ApiResponse<>(false, e.getMessage(), new ArrayList<>()));
@@ -65,6 +74,7 @@ public class ProductController {
             var product = productService.getProductById(productId);
             return ResponseEntity.ok(product);
         } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage());
             return ResponseEntity
                     .internalServerError()
                     .body(new ApiResponse<>(false,

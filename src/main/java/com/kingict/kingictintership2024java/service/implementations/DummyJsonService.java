@@ -1,11 +1,15 @@
 package com.kingict.kingictintership2024java.service.implementations;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kingict.kingictintership2024java.dto.AddProductDto;
 import com.kingict.kingictintership2024java.service.IExternalApiService;
 import jakarta.transaction.Transactional;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -18,6 +22,8 @@ import java.util.List;
 @Service
 @Transactional
 public class DummyJsonService implements IExternalApiService {
+
+    private final Logger logger = LogManager.getLogger(DummyJsonService.class);
     
     @Override
     public List<AddProductDto> getDataFromApi() {
@@ -38,13 +44,14 @@ public class DummyJsonService implements IExternalApiService {
                         .readValue(responseBody, ProductJsonResponse.class)
                         .getProducts();   
         } catch (Exception e) {
-            //Logger here
+                logger.log(Level.ERROR, e.getMessage());
             return new ArrayList<>();
         }
     }
     
     @Getter
     @Setter
+    @JsonIgnoreProperties(ignoreUnknown = true)
     private static class ProductJsonResponse {
         private List<AddProductDto> products = new ArrayList<>();
     }
