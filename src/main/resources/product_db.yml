@@ -1,7 +1,8 @@
 version: '3.8'
 services:
   db:
-    image: postgres
+    image: postgres:latest
+    container_name: king-ict-task-java
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
