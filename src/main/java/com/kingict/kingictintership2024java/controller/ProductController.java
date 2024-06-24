@@ -6,8 +6,6 @@ import com.kingict.kingictintership2024java.service.IProductService;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +23,12 @@ public class ProductController {
     public ProductController(IProductService productService) {
         this.productService = productService;
     }
-    
+
+    /**
+     * Retrieves all products from the db.
+     *
+     * @return ResponseEntity with all the products from the db.
+     **/
     @GetMapping("")
     public ResponseEntity<ApiResponse<List<ProductDto>>> getAllProducts() {
         try {
@@ -39,6 +42,12 @@ public class ProductController {
         }
     }
 
+    /**
+     * Retrieves all products with same or similar name from the db.
+     *
+     * @param name The exact/similar name of the products.
+     * @return ResponseEntity with the found products.
+     **/
     @GetMapping("/name")
     public ResponseEntity<ApiResponse<List<ProductDto>>> getAllProductsByName(
             @RequestParam(defaultValue = "") String name) {
@@ -53,6 +62,13 @@ public class ProductController {
         }
     }
 
+    /**
+     * Retrieves all products with same category and price that is the same/lower from the db.
+     *
+     * @param category The category of the product.
+     * @param price The price of the product.
+     * @return ResponseEntity with the found products.
+     **/
     @GetMapping("/category-and-price")
     public ResponseEntity<ApiResponse<List<ProductDto>>> getAllProductsByCategoryAndName(
             @RequestParam(defaultValue = "groceries") String category, 
@@ -68,10 +84,16 @@ public class ProductController {
         }
     }
 
-    @GetMapping("/{productId}")
-    public ResponseEntity<ApiResponse<ProductDto>> getAllProductsByName(@PathVariable("productId") UUID productId) {
+    /**
+     * Retrieves the product from the db with the given id.
+     *
+     * @param id The id of the product.
+     * @return ResponseEntity with the found product.
+     **/
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductDto>> getAllProductsByName(@PathVariable("id") UUID id) {
         try {
-            var product = productService.getProductById(productId);
+            var product = productService.getProductById(id);
             return ResponseEntity.ok(product);
         } catch (Exception e) {
             logger.log(Level.ERROR, e.getMessage());

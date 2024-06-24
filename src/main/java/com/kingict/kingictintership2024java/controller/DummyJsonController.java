@@ -24,6 +24,9 @@ public class DummyJsonController {
         this.productService = productService;
     }
 
+    /**
+     * Retrieves data from the DummyJson api and stores it in the db.
+     **/
     @GetMapping("")
     public ResponseEntity<ApiResponse<String>> GetDataFromApi() {
         try {

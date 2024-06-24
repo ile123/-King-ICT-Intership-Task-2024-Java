@@ -1,11 +1,11 @@
 version: '3.8'
 services:
   db:
-    image: postgres:latest
+    image: postgres
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=product_db_java
     ports:
       - "5432:5432"
-#sudo docker compose -f product_db.yml -p product_db_java up --build
+#sudo docker compose -f product_db.yml up --build

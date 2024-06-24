@@ -14,13 +14,16 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "product_images")
 public class Image {
     
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", unique = true, nullable = false)
     private UUID id;
     
     @Getter
+    @Column(name = "image_url", nullable = false)
     private String imageUrl = "";
 
     @CreationTimestamp
